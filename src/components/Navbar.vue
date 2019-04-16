@@ -1,6 +1,8 @@
 <template lang="html">
   <nav>
 
+    <Authform/>
+
     <!-- Main navigation body -->
     <v-toolbar app
                flat
@@ -23,10 +25,10 @@
       <!-- Buttons for md-xl devices -->
       <v-toolbar-items>
         <v-btn flat
-               v-for="page in navigations"
-               :key="page.title"
+               v-for="(page, index) in navigations"
+               :key="page.title + index"
                :color="page.color"
-               v-if="user && page.condition == 'any'"
+               v-if="page.condition"
                class="hidden-sm-and-down"
                router :to="page.route">
           <span>{{ page.title }}</span>
@@ -65,8 +67,8 @@
       <v-list>
 
         <v-list-tile
-          v-for="page in navigations"
-          :key="page.title"
+          v-for="(page, index) in navigations"
+          :key="page.title + index"
           v-if="page.condition"
           router :to="page.route"
         >
@@ -89,34 +91,41 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
+import Authform from './Authform'
 
 export default {
   name: 'Navbar',
 
+  components: {
+    Authform
+  },
+
   data() {
     return {
       drawer: false,
-      navigations: [
-        { title: 'Map', icon: 'location_on', color: 'green darken-1', route: '/map', condition: 'any' },
-        { title: 'About', icon: 'info', color: 'green darken-1', route: '/about', condition: 'any' },
-        { title: 'Sign up', icon: 'person_add', color: 'amber darken-3', route: '/sign-up', condition: true  },
-        { title: 'Sign in', icon: 'person', color: 'amber darken-3', route: '/sign-in', condition: true  },
-        { title: 'Sign Out', icon: 'exit_to_app', color: 'amber darken-3', condition: true }
-      ],
     }
   },
 
   methods: {
-    log() {
-      console.log('Clicked nav');
-    }
+    ...mapActions([
+      'openAuthDialogAction'
+    ])
   },
 
   computed: {
     ...mapState([
       'user'
-    ])
+    ]),
+    navigations() {
+      return [
+        { title: 'Map', icon: 'location_on', color: 'green darken-1', route: '/map', condition: true, onclick: '' },
+        { title: 'About', icon: 'info', color: 'green darken-1', route: '/about', condition: true, onclick: '' },
+        { title: 'Sign up', icon: 'person_add', color: 'amber darken-3', route: '/sign-up', condition: !this.user, onclick: ''  },
+        { title: 'Sign in', icon: 'person', color: 'amber darken-3', route: '/sign-in', condition: !this.user, onclick: ''  },
+        { title: 'Sign Out', icon: 'exit_to_app', color: 'amber darken-3', condition: this.user, onclick: '' }
+      ]
+    }
   }
 }
 </script>

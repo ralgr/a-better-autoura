@@ -5,7 +5,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    user: null
+    user: null,
+    authDialog: false
   },
 
   getters: {
@@ -13,10 +14,14 @@ export default new Vuex.Store({
   },
 
   mutations: {
-
+    openAuthDialog: (state) => {
+      state.authDialog = true
+    }
   },
 
   actions: {
-
+    openAuthDialogAction: ({ commit }) => {
+      commit('openAuthDialog')
+    }
   }
 })
