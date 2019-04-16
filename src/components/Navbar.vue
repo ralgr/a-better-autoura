@@ -22,6 +22,7 @@
 
       <!-- Buttons for md-xl devices -->
       <v-toolbar-items>
+        <!-- Auto created buttons -->
         <v-btn flat
                v-for="page in navigations"
                :key="page.title"
@@ -30,6 +31,34 @@
                router :to="page.route">
           <span>{{ page.title }}</span>
           <v-icon right>{{ page.icon }}</v-icon>
+        </v-btn>
+
+        <!-- Manually created buttons -->
+        <!-- Sign up -->
+        <v-btn flat
+               color="amber darken-3"
+               class="hidden-sm-and-down"
+               v-if="!user"
+               router to="/sign-up">
+          <span>Sign up</span>
+          <v-icon right>person_add</v-icon>
+        </v-btn>
+        <!-- Sign up -->
+        <v-btn flat
+               color="amber darken-3"
+               class="hidden-sm-and-down"
+               v-if="!user"
+               router to="/sign-in">
+          <span>Sign in</span>
+          <v-icon right>person</v-icon>
+        </v-btn>
+        <!-- Log out -->
+        <v-btn flat
+               color="amber darken-3"
+               class="hidden-sm-and-down"
+               v-if="user">
+          <span>Sign out</span>
+          <v-icon right>exit_to_app</v-icon>
         </v-btn>
       </v-toolbar-items>
 
@@ -63,6 +92,7 @@
       <!-- Navigation tile -->
       <v-list class="pt-4">
 
+        <!-- Auto created tiles -->
         <v-list-tile
           v-for="page in navigations"
           :key="page.title"
@@ -79,6 +109,8 @@
 
         </v-list-tile>
 
+        Manually created tiles
+
       </v-list>
 
     </v-navigation-drawer>
@@ -87,6 +119,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
   name: 'Navbar',
 
@@ -95,10 +129,7 @@ export default {
       drawer: false,
       navigations: [
         { title: 'Map', icon: 'location_on', color: 'green darken-1', route: '/map' },
-        { title: 'About', icon: 'info', color: 'green darken-1', route: '/about' },
-        { title: 'Sign up', icon: 'person_add', color: 'green darken-1', route: '/sign-up' },
-        { title: 'Sign in', icon: 'person', color: 'green darken-1', route: '/sign-in' },
-        { title: 'Sign Out', icon: 'exit_to_app', color: 'amber darken-3' }
+        { title: 'About', icon: 'info', color: 'green darken-1', route: '/about' }
       ],
     }
   },
@@ -107,6 +138,12 @@ export default {
     log() {
       console.log('Clicked nav');
     }
+  },
+
+  computed: {
+    ...mapState([
+      'user'
+    ])
   }
 }
 </script>
