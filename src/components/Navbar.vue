@@ -22,43 +22,15 @@
 
       <!-- Buttons for md-xl devices -->
       <v-toolbar-items>
-        <!-- Auto created buttons -->
         <v-btn flat
                v-for="page in navigations"
                :key="page.title"
                :color="page.color"
+               v-if="user && page.condition == 'any'"
                class="hidden-sm-and-down"
                router :to="page.route">
           <span>{{ page.title }}</span>
           <v-icon right>{{ page.icon }}</v-icon>
-        </v-btn>
-
-        <!-- Manually created buttons -->
-        <!-- Sign up -->
-        <v-btn flat
-               color="amber darken-3"
-               class="hidden-sm-and-down"
-               v-if="!user"
-               router to="/sign-up">
-          <span>Sign up</span>
-          <v-icon right>person_add</v-icon>
-        </v-btn>
-        <!-- Sign up -->
-        <v-btn flat
-               color="amber darken-3"
-               class="hidden-sm-and-down"
-               v-if="!user"
-               router to="/sign-in">
-          <span>Sign in</span>
-          <v-icon right>person</v-icon>
-        </v-btn>
-        <!-- Log out -->
-        <v-btn flat
-               color="amber darken-3"
-               class="hidden-sm-and-down"
-               v-if="user">
-          <span>Sign out</span>
-          <v-icon right>exit_to_app</v-icon>
         </v-btn>
       </v-toolbar-items>
 
@@ -73,7 +45,7 @@
       temporary
     >
       <!-- Avatar information -->
-      <v-layout column wrap align-center>
+      <v-layout column wrap align-center v-if="this.user">
         <v-flex class="ma-4">
 
         <!-- Avatar image -->
@@ -90,12 +62,12 @@
       </v-layout>
 
       <!-- Navigation tile -->
-      <v-list class="pt-4">
+      <v-list>
 
-        <!-- Auto created tiles -->
         <v-list-tile
           v-for="page in navigations"
           :key="page.title"
+          v-if="page.condition"
           router :to="page.route"
         >
 
@@ -108,8 +80,6 @@
           </v-list-tile-content>
 
         </v-list-tile>
-
-        Manually created tiles
 
       </v-list>
 
@@ -128,8 +98,11 @@ export default {
     return {
       drawer: false,
       navigations: [
-        { title: 'Map', icon: 'location_on', color: 'green darken-1', route: '/map' },
-        { title: 'About', icon: 'info', color: 'green darken-1', route: '/about' }
+        { title: 'Map', icon: 'location_on', color: 'green darken-1', route: '/map', condition: 'any' },
+        { title: 'About', icon: 'info', color: 'green darken-1', route: '/about', condition: 'any' },
+        { title: 'Sign up', icon: 'person_add', color: 'amber darken-3', route: '/sign-up', condition: true  },
+        { title: 'Sign in', icon: 'person', color: 'amber darken-3', route: '/sign-in', condition: true  },
+        { title: 'Sign Out', icon: 'exit_to_app', color: 'amber darken-3', condition: true }
       ],
     }
   },
