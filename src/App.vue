@@ -3,8 +3,10 @@
 
     <Navbar/>
 
-    <v-content class="ma-4">
+    <v-content>
+      <v-container fluid class="pa-0">
         <router-view></router-view>
+      </v-container>
     </v-content>
 
   </v-app>
@@ -12,6 +14,8 @@
 
 <script>
 import Navbar from './components/Navbar'
+import { fb } from './config/Firebase'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'App',
@@ -26,9 +30,34 @@ export default {
   },
 
   methods: {
+    ...mapActions([
+      'setUserAction',
+      'clearUserAction'
+    ]),
     log() {
       console.log('Test');
     }
+  },
+
+  created() {
+    // Detect sign ins and outs.
+    fb.auth().onAuthStateChanged(user => {
+      if (user) {
+
+        // Set user in store.
+        this.setUserAction(user)
+
+        // Push to map
+        this.$router.push('/')
+        console.log(user.email + ' is currently logged in');
+      } else {
+        // User is signed out.
+        fb.auth().signOut();
+
+        // User is cleared on store
+        this.clearUserAction
+      }
+    });
   }
 }
 </script>

@@ -1,8 +1,6 @@
 <template lang="html">
   <nav>
 
-    <Popup :signIn="false"/>
-
     <!-- Main navigation body -->
     <v-toolbar app
                flat
@@ -41,7 +39,7 @@
                color="amber darken-3"
                class="hidden-sm-and-down"
                v-if="!user"
-               @click="authDialogAction">
+               router to="/sign-up">
           <span>Sign up</span>
           <v-icon right>person_add</v-icon>
         </v-btn>
@@ -50,19 +48,64 @@
                color="amber darken-3"
                class="hidden-sm-and-down"
                v-if="!user"
-               @click="authDialogAction">
+               router to="/sign-in">
           <span>Sign in</span>
           <v-icon right>person</v-icon>
         </v-btn>
-        <!-- Sign out -->
-        <v-btn flat
-               color="amber darken-3"
-               class="hidden-sm-and-down"
-               v-if="user">
-          <span>Sign out</span>
-          <v-icon right>exit_to_app</v-icon>
-        </v-btn>
       </v-toolbar-items>
+
+      <!-- User icon menu popover -->
+      <div class="text-xs-center">
+        <!-- Menu body -->
+        <v-menu
+          :close-on-content-click="true"
+          offset-y
+          v-if="user"
+        >
+
+          <!-- Avatar icon on toolbar -->
+          <template v-slot:activator="{ on }">
+            <v-avatar color="indigo"
+                      v-on="on"
+                      class="avatar-micon ml-4 hidden-sm-and-down">
+              <v-icon dark>account_circle</v-icon>
+            </v-avatar>
+          </template>
+
+          <v-card>
+
+            <!-- User on card -->
+            <v-list>
+              <v-list-tile>
+                <!-- User on menu popover -->
+                <v-list-tile-content>
+                  <v-list-tile-title>{{ user }}</v-list-tile-title>
+                </v-list-tile-content>
+              </v-list-tile>
+            </v-list>
+
+            <v-divider></v-divider>
+
+            <!-- Menu popover buttons -->
+            <v-list>
+              <v-list-tile>
+
+                <v-btn flat round left
+                       color="amber darken-3"
+                       class="hidden-sm-and-down"
+                       v-if="user"
+                       :loading="loading"
+                       @click="signOut">
+                  <span>Sign out</span>
+                  <v-icon right>exit_to_app</v-icon>
+                </v-btn>
+
+              </v-list-tile>
+            </v-list>
+          </v-card>
+
+        </v-menu>
+      </div>
 
     </v-toolbar>
 
@@ -75,7 +118,7 @@
       temporary
     >
       <!-- Avatar information -->
-      <v-layout column wrap align-center>
+      <v-layout column wrap align-center v-if="user">
         <v-flex class="ma-4">
 
         <!-- Avatar image -->
@@ -87,7 +130,7 @@
 
         </v-flex>
 
-        <p>User Name</p>
+        <p>{{ user }}</p>
 
       </v-layout>
 
@@ -112,7 +155,8 @@
         </v-list-tile>
 
         <!-- Manually created tiles -->
-        <v-list-tile v-if="!user" @click="authDialogAction">
+        <!-- Sign up tile -->
+        <v-list-tile v-if="!user" router to="/sign-up">
 
           <v-list-tile-action>
             <v-icon>person_add</v-icon>
@@ -124,7 +168,8 @@
 
         </v-list-tile>
 
-        <v-list-tile v-if="!user" @click="authDialogAction">
+        <!-- Sign in tile -->
+        <v-list-tile v-if="!user" router to="/sign-in">
 
           <v-list-tile-action>
             <v-icon>person</v-icon>
@@ -136,7 +181,8 @@
 
         </v-list-tile>
 
-        <v-list-tile v-if="user">
+        <!-- Sign out tile -->
+        <v-list-tile v-if="user" @click="signOut">
 
           <v-list-tile-action>
             <v-icon>exit_to_app</v-icon>
@@ -157,42 +203,61 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import Popup from './Popup'
+import { fb } from '@/config/Firebase'
 
 export default {
   name: 'Navbar',
 
   components: {
-    Popup
+
   },
 
   data() {
     return {
       drawer: false,
       navigations: [
-        { title: 'Map', icon: 'location_on', color: 'green darken-1', route: '/map' },
+        { title: 'Map', icon: 'location_on', color: 'green darken-1', route: '/' },
         { title: 'About', icon: 'info', color: 'green darken-1', route: '/about' }
       ],
+      loading: false
     }
   },
 
   methods: {
-    log() {
-      console.log('Clicked nav');
-    },
     ...mapActions([
-      'authDialogAction'
-    ])
+      'clearUserAction'
+    ]),
+    signOut() {
+      // Show loading animation
+      this.loading = true
+
+      // Sign out user
+      fb.auth().signOut()
+      .then(() => {
+        console.log('Log out success');
+
+        // Clear user in the store
+        this.clearUserAction()
+
+        // Stop loading animation
+        this.loading = false
+
+        // Push to sign in
+        this.$router.push('/sign-in');
+      })
+    }
   },
 
   computed: {
     ...mapState([
-      'user',
-      'authDialog'
+      'user'
     ])
   }
 }
 </script>
 
 <style lang="css" scoped>
+  .avatar-micon {
+    cursor: pointer;
+  }
 </style>

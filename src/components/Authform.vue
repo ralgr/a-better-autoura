@@ -1,5 +1,6 @@
 <template lang="html">
   <div class="form">
+    <!-- Authentication form -->
     <v-form class="px-3"
             ref="form">
 
@@ -27,10 +28,48 @@
              :loading="loading"
              @click="submitForm">submit</v-btn>
     </v-form>
+
+    <!-- Sign in errors -->
+    <div class="text-xs-center">
+     <v-dialog
+       v-model="dialog"
+       width="500"
+     >
+
+       <v-card>
+         <v-card-title
+           class="headline red lighten-1"
+           primary-title
+         >
+           Error!
+         </v-card-title>
+
+         <v-card-text>
+           <p v-for="(error, index) in errors" :key="index">{{ error }}</p>
+         </v-card-text>
+
+         <v-divider></v-divider>
+
+         <v-card-actions>
+           <v-spacer></v-spacer>
+           <v-btn
+             color="primary"
+             flat
+             @click="dialog = false"
+           >
+             I accept
+           </v-btn>
+         </v-card-actions>
+       </v-card>
+     </v-dialog>
+   </div>
+
   </div>
 </template>
 
 <script>
+import { fb } from '@/config/Firebase'
+
 export default {
   name: "Authform",
 
@@ -55,29 +94,78 @@ export default {
       emailRules: [
         v => !!v || 'E-mail is required',
         v => /.+@.+/.test(v) || 'E-mail must be valid'
-      ]
+      ],
+      errors: [],
+      dialog: false
     }
   },
 
   methods: {
     submitForm() {
       if (this.$refs.form.validate()) {
-        console.log('Clicked validate');
+
+        // Showing loading animation
         this.loading = true;
 
+        // Setting user variable
         const user = {
           email: this.email,
           password: this.password,
         };
 
-        setTimeout(this.loading = false, 1000)
+        // Activates if the user is signing in
+        if (this.signIn) {
+          console.log(user.email + ' is trying to log in.');
+          fb.auth().signInWithEmailAndPassword(user.email, user.password)
+          .then(() => {
+            // Stopping loading animation
+            this.loading = false;
 
-        // db.collection('anti-lazy-projects').add(project)
-        // .then(() => {
-        //   this.loading = false;
-        //   this.dialog = false;
-        //   this.$emit('project-added')
-        // })
+          })
+          .catch(error => {
+            // Handle Errors here.
+            var errorMessage = error.message;
+
+            // Clear error array then push new error to array
+            this.errors = []
+            this.errors.push(errorMessage);
+
+            // Opens error dialog
+            this.dialog = true
+
+            // Stopping loading animation
+            this.loading = false;
+          });
+        }
+
+        // Activates if the user is signing up
+        if (!this.signIn) {
+          console.log(user.email + ' is trying to sign up.');
+          fb.auth().createUserWithEmailAndPassword(user.email, user.password)
+          .then(() => {
+            // Stopping loading animation
+            this.loading = false;
+
+            console.log(user.email + ' has signed up.');
+
+            // Reroutes to sign in
+            this.$router.push("/sign-in")
+          })
+          .catch(error => {
+            // Handle Errors here.
+            var errorMessage = error.message;
+
+            // Clear error array then push new error to array
+            this.errors = []
+            this.errors.push(errorMessage);
+
+            // Opens error dialog
+            this.dialog = true
+
+            // Stopping loading animation
+            this.loading = false;
+          });
+        }
       }
     }
   },

@@ -1,4 +1,5 @@
 import firebase from 'firebase/app'
+import 'firebase/auth'
 import 'firebase/firestore'
 
 var config = {
@@ -10,11 +11,8 @@ var config = {
     messagingSenderId: "107072092595"
   };
 
-firebase.initializeApp(config);
-
-const db = firebase.firestore(); //Database export.
+export const fb = firebase.initializeApp(config);
+export const db = firebase.firestore(); //Database export.
 
 // Enable offline persistence
-db.enablePersistence({experimentalTabSynchronization:true})
-
-export default db;
+db.enablePersistence({experimentalTabSynchronization:true});

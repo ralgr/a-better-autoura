@@ -5,8 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    user: null,
-    authDialog: false
+    user: null
   },
 
   getters: {
@@ -14,18 +13,20 @@ export default new Vuex.Store({
   },
 
   mutations: {
-    authDialogMutation: state => {
-      if (state.authDialog == true) {
-        state.authDialog = false
-      } else if (state.authDialog == false) {
-        state.authDialog = true
-      }
+    setUser: (state, payload) => {
+      state.user = payload.email
+    },
+    clearUser: state => {
+      state.user = null
     }
   },
 
   actions: {
-    authDialogAction: ({ commit }) => {
-      commit('authDialogMutation')
+    setUserAction: ({ commit }, payload) => {
+      commit('setUser', payload)
+    },
+    clearUserAction: ({ commit }) => {
+      commit('clearUser')
     }
   }
 })
