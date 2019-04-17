@@ -1,6 +1,8 @@
 <template lang="html">
   <nav>
 
+    <Popup :signIn="false"/>
+
     <!-- Main navigation body -->
     <v-toolbar app
                flat
@@ -39,20 +41,20 @@
                color="amber darken-3"
                class="hidden-sm-and-down"
                v-if="!user"
-               router to="/sign-up">
+               @click="authDialogAction">
           <span>Sign up</span>
           <v-icon right>person_add</v-icon>
         </v-btn>
-        <!-- Sign up -->
+        <!-- Sign in -->
         <v-btn flat
                color="amber darken-3"
                class="hidden-sm-and-down"
                v-if="!user"
-               router to="/sign-in">
+               @click="authDialogAction">
           <span>Sign in</span>
           <v-icon right>person</v-icon>
         </v-btn>
-        <!-- Log out -->
+        <!-- Sign out -->
         <v-btn flat
                color="amber darken-3"
                class="hidden-sm-and-down"
@@ -109,7 +111,42 @@
 
         </v-list-tile>
 
-        Manually created tiles
+        <!-- Manually created tiles -->
+        <v-list-tile v-if="!user" @click="authDialogAction">
+
+          <v-list-tile-action>
+            <v-icon>person_add</v-icon>
+          </v-list-tile-action>
+
+          <v-list-tile-content>
+            <v-list-tile-title>Sign up</v-list-tile-title>
+          </v-list-tile-content>
+
+        </v-list-tile>
+
+        <v-list-tile v-if="!user" @click="authDialogAction">
+
+          <v-list-tile-action>
+            <v-icon>person</v-icon>
+          </v-list-tile-action>
+
+          <v-list-tile-content>
+            <v-list-tile-title>Sign in</v-list-tile-title>
+          </v-list-tile-content>
+
+        </v-list-tile>
+
+        <v-list-tile v-if="user">
+
+          <v-list-tile-action>
+            <v-icon>exit_to_app</v-icon>
+          </v-list-tile-action>
+
+          <v-list-tile-content>
+            <v-list-tile-title>Sign out</v-list-tile-title>
+          </v-list-tile-content>
+
+        </v-list-tile>
 
       </v-list>
 
@@ -119,10 +156,15 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
+import Popup from './Popup'
 
 export default {
   name: 'Navbar',
+
+  components: {
+    Popup
+  },
 
   data() {
     return {
@@ -137,12 +179,16 @@ export default {
   methods: {
     log() {
       console.log('Clicked nav');
-    }
+    },
+    ...mapActions([
+      'authDialogAction'
+    ])
   },
 
   computed: {
     ...mapState([
-      'user'
+      'user',
+      'authDialog'
     ])
   }
 }
