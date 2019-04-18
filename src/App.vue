@@ -9,11 +9,14 @@
       </v-container>
     </v-content>
 
+    <Footer/>
+
   </v-app>
 </template>
 
 <script>
 import Navbar from './components/Navbar'
+import Footer from './components/Footer'
 import { fb } from './config/Firebase'
 import { mapActions } from 'vuex'
 
@@ -21,7 +24,8 @@ export default {
   name: 'App',
 
   components: {
-    Navbar
+    Navbar,
+    Footer
   },
 
   data () {
