@@ -5,7 +5,17 @@
       <v-flex xs12>
 
         <v-card >
-
+          <v-btn
+                color="pink"
+                dark
+                absolute
+                bottom
+                right
+                fab
+                @click="openMapUi"
+              >
+                <v-icon>search</v-icon>
+              </v-btn>
           <Mapui/>
 
           <v-responsive height="80vh">
@@ -46,6 +56,7 @@
 <script>
 import {LMap, LTileLayer, LMarker, LPopup, LIcon} from 'vue2-leaflet'
 import Mapui from '@/components/Mapui'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'Map',
@@ -65,6 +76,15 @@ export default {
       zoom: 3,
       url:'https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=7322db1e4e254654a10f61d4a4b906c3',
       attribution:'&copy; <a href="https://www.thunderforest.com/privacy/">Thunderforest</a>',
+    }
+  },
+
+  methods: {
+    ...mapActions([
+      'openDrawerAction'
+    ]),
+    openMapUi() {
+      this.openDrawerAction()
     }
   }
 }

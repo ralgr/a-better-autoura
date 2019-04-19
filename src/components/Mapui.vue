@@ -1,123 +1,137 @@
 <template lang="html">
   <div class="mapui">
 
-    <v-layout row wrap>
-      <v-flex xs8>
 
-        <v-card>
+    <v-layout column wrap>
 
-          <v-layout row wrap justify-center>
+      <v-navigation-drawer
+        :value="drawer"
+        hide-overlay
+        stateless
+        temporary
+        light
+        height="80vh"
+        :style="{display: isOpen}"
+      >
 
-            <v-flex xs8>
+      <v-list class="ma-3">
+        <v-list-tile
 
-              <v-responsive>
-                <v-card-actions>
-                  <v-flex xs3 d-flex>
-                    <v-select
-                      :items="groupCont"
-                      label="Group Context"
-                    ></v-select>
-                  </v-flex>
-                </v-card-actions>
-                <v-card-actions>
-                  <v-flex xs3 d-flex>
-                    <v-select
-                      :items="stopTypes"
-                      label="Location Type"
-                    ></v-select>
-                  </v-flex>
-                </v-card-actions>
+        >
+          <v-list-tile-action>
+            <v-icon>people</v-icon>
+          </v-list-tile-action>
 
-                <v-list two-line>
-                  <template v-for="(item, index) in items">
-                    <v-subheader
-                      v-if="item.header"
-                      :key="item.header"
-                    >
-                      {{ item.header }}
-                    </v-subheader>
-
-                    <v-divider
-                      v-else-if="item.divider"
-                      :key="index"
-                      :inset="item.inset"
-                    ></v-divider>
-
-                    <v-list-tile
-                      v-else
-                      :key="item.title"
-                      avatar
-                      @click=""
-                    >
-                      <v-list-tile-avatar>
-                        <img :src="item.avatar">
-                      </v-list-tile-avatar>
-
-                      <v-list-tile-content>
-                        <v-list-tile-title v-html="item.title"></v-list-tile-title>
-                        <v-list-tile-sub-title v-html="item.subtitle"></v-list-tile-sub-title>
-                      </v-list-tile-content>
-                    </v-list-tile>
-                  </template>
-                </v-list>
-
-              </v-responsive>
-
+          <v-list-tile-content>
+            <v-flex pt-2 xs12 d-flex>
+              <v-select
+                :items="groupCont"
+                label="group context"
+                v-model="pickedContext"
+              ></v-select>
             </v-flex>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
 
-          </v-layout>
+      <v-flex xs12>
 
-        </v-card>
+        <v-list three-line scrollable>
+          <v-subheader>Results</v-subheader>
+            <template v-for="(stop, index) in stops">
+
+              <v-divider></v-divider>
+
+
+                <v-list-tile
+                  :key="stop.stop_id"
+                  avatar
+                >
+                  <v-list-tile-avatar>
+                    <img src="https://randomuser.me/api/portraits/men/85.jpg">
+                  </v-list-tile-avatar>
+
+                  <v-list-tile-content>
+                    <v-list-tile-title v-html="stop.name"></v-list-tile-title>
+                    <v-list-tile-sub-title v-html="stop.location.address"></v-list-tile-sub-title>
+                  </v-list-tile-content>
+                </v-list-tile>
+
+            </template>
+
+          </v-list>
 
       </v-flex>
+
+      </v-navigation-drawer>
+
     </v-layout>
 
   </div>
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex'
+import { AUTORA_KEY } from '@/config/Autoura'
+import axios from 'axios'
+
 export default {
   name: 'Mapui',
 
   data() {
     return {
       groupCont: [
-        'Solo',
-        'Couple',
-        'Friends',
-        'Kids',
-        'Teenagers',
-        'Group',
-        'Party',
+        'solo',
+        'couple',
+        'friends',
+        'kids',
+        'teenagers',
+        'group',
+        'party',
       ],
-      stopTypes: [
-        'Accommodation',
-        'Food',
-        'Event',
-        'Points of interest',
-        'Attraction',
-        'Tour',
-      ],
+      pickedContext: '',
       items: [
-          { header: 'Today' },
-          {
-            avatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
-            title: 'Brunch this weekend?',
-            subtitle: "<span class='text--primary'>Ali Connors</span> &mdash; I'll be in your neighborhood doing errands this weekend. Do you want to hang out?"
-          },
-          { divider: true, inset: true },
-          {
-            avatar: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
-            title: 'Summer BBQ <span class="grey--text text--lighten-1">4</span>',
-            subtitle: "<span class='text--primary'>to Alex, Scott, Jennifer</span> &mdash; Wish I could come, but I'm out of town this weekend."
-          },
-          { divider: true, inset: true },
-          {
-            avatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
-            title: 'Oui oui',
-            subtitle: "<span class='text--primary'>Sandra Adams</span> &mdash; Do you have Paris recommendations? Have you ever been?"
-          }
+          { title: 'Home', icon: 'dashboard' },
+          { title: 'About', icon: 'question_answer' }
         ]
+    }
+  },
+
+  methods: {
+    ...mapActions([
+      'setStopsAction'
+    ]),
+    getStops() {
+      const autora = axios.create({ headers: { 'Authorization': 'Bearer ' + AUTORA_KEY } })
+      var url = `https://api.autoura.com/api/stops/search?group_context=${this.pickedContext}&stop_types=food`
+      autora.get(url)
+      .then(r => {
+
+        // Stops are sent to the store
+        this.setStopsAction(r.data.response);
+      }).catch(e => {
+
+        // Log error
+        console.log(e);
+
+      });
+    }
+  },
+
+  computed: {
+    ...mapState([
+      'stops',
+      'drawer'
+    ]),
+    isOpen() {
+      return this.drawer == false ? 'none' : 'block'
+    }
+  },
+
+  watch: {
+    pickedContext: {
+      handler: 'getStops',
+      immediate: true
     }
   }
 }

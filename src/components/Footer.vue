@@ -6,13 +6,7 @@
 
       <v-layout row wrap justify-center>
 
-        <v-card flat class="grey darken-4">
-
-          <v-card-text>
-            <strong class="caption font-weight-light grey--text">&copy;2019 — InformationMap</strong>
-          </v-card-text>
-
-        </v-card>
+        <strong class="caption font-weight-light grey--text">&copy;2019 — InformationMap</strong>
 
       </v-layout>
 

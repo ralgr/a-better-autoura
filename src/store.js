@@ -5,7 +5,9 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    user: null
+    user: null,
+    stops: [],
+    drawer: false
   },
 
   getters: {
@@ -18,6 +20,16 @@ export default new Vuex.Store({
     },
     clearUser: state => {
       state.user = null
+    },
+    setStops: (state, payload) => {
+      state.stops = payload
+    },
+    openDrawer: state => {
+      if (state.drawer == true) {
+        state.drawer = false
+      } else if (state.drawer == false) {
+        state.drawer = true
+      }
     }
   },
 
@@ -27,6 +39,12 @@ export default new Vuex.Store({
     },
     clearUserAction: ({ commit }) => {
       commit('clearUser')
+    },
+    setStopsAction: ({ commit }, payload) => {
+      commit('setStops', payload)
+    },
+    openDrawerAction: ({ commit }) => {
+      commit('openDrawer')
     }
   }
 })
