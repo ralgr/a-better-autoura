@@ -4,19 +4,25 @@
     <v-layout row wrap>
       <v-flex xs12>
 
+        <!-- Map card container -->
         <v-card >
-          <v-btn
-                color="pink"
-                dark
-                absolute
-                bottom
-                right
-                fab
-                @click="openMapUi"
-              >
-                <v-icon>search</v-icon>
-              </v-btn>
+
+          <!-- FAB button to open UI -->
+          <v-btn color="blue"
+                 dark
+                 absolute
+                 bottom
+                 left
+                 fab
+                 @click="openMapUi">
+              <v-icon>search</v-icon>
+            </v-btn>
+
+          <!-- Map UI custom component -->
           <Mapui/>
+
+          <!-- Information card component -->
+          <Moreinfo/>
 
           <v-responsive height="80vh">
             <l-map :zoom="zoom"
@@ -56,12 +62,14 @@
 <script>
 import {LMap, LTileLayer, LMarker, LPopup, LIcon} from 'vue2-leaflet'
 import Mapui from '@/components/Mapui'
+import Moreinfo from '@/components/Moreinfo'
 import { mapActions } from 'vuex'
 
 export default {
   name: 'Map',
 
   components: {
+    Moreinfo,
     Mapui,
     LMap,
     LTileLayer,

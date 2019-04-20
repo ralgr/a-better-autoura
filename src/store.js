@@ -7,7 +7,9 @@ export default new Vuex.Store({
   state: {
     user: null,
     stops: [],
-    drawer: false
+    drawer: false,
+    info: null,
+    dialog: false
   },
 
   getters: {
@@ -30,6 +32,17 @@ export default new Vuex.Store({
       } else if (state.drawer == false) {
         state.drawer = true
       }
+    },
+    setInfo: (state, payload) => {
+      state.info = payload
+      console.log(state.info);
+    },
+    openInfo: state => {
+      if (state.dialog == true) {
+        state.dialog = false
+      } else if (state.dialog == false) {
+        state.dialog = true
+      }
     }
   },
 
@@ -45,6 +58,12 @@ export default new Vuex.Store({
     },
     openDrawerAction: ({ commit }) => {
       commit('openDrawer')
+    },
+    setInfoAction: ({ commit }, payload) => {
+      commit('setInfo', payload)
+    },
+    openInfoAction: ({ commit }) => {
+      commit('openInfo')
     }
   }
 })

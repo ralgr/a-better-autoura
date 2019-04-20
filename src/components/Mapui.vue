@@ -46,9 +46,17 @@
                 <v-list-tile
                   :key="stop.stop_id"
                   avatar
+                  @click="moreInfo(index)"
                 >
                   <v-list-tile-avatar>
-                    <img src="https://randomuser.me/api/portraits/men/85.jpg">
+                    <cld-image :cloudName="stop.picture.cloudinary_cloud_name"
+                               :publicId="stop.picture.cloudinary_public_id"
+                               secure="true"
+                               dpr="auto"
+                               width="auto"
+                               crop="scale">
+                      <cld-transformation crop="thumb"/>
+                    </cld-image>
                   </v-list-tile-avatar>
 
                   <v-list-tile-content>
@@ -74,9 +82,15 @@
 import { mapState, mapActions } from 'vuex'
 import { AUTORA_KEY } from '@/config/Autoura'
 import axios from 'axios'
+import {CldImage, CldTransformation} from 'cloudinary-vue'
 
 export default {
   name: 'Mapui',
+
+  components: {
+    CldImage,
+    CldTransformation
+  },
 
   data() {
     return {
@@ -99,7 +113,9 @@ export default {
 
   methods: {
     ...mapActions([
-      'setStopsAction'
+      'setStopsAction',
+      'setInfoAction',
+      'openInfoAction'
     ]),
     getStops() {
       const autora = axios.create({ headers: { 'Authorization': 'Bearer ' + AUTORA_KEY } })
@@ -115,6 +131,10 @@ export default {
         console.log(e);
 
       });
+    },
+    moreInfo(index) {
+      this.setInfoAction(this.stops[index])
+      this.openInfoAction()
     }
   },
 
