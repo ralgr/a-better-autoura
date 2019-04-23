@@ -54,5 +54,7 @@ npm install http-server -g
 ### Enter in CLI (For testing PWA)
 ```
 http-server dist
+Select http://127.0.0.1:8080
+Set browser to offline mode
 ```
 
