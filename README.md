@@ -1,4 +1,4 @@
-# autora-a1
+# autora-a1 V2
 
 This project uses:
 * [Vue](https://vuejs.org/)
