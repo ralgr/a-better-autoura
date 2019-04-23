@@ -34,6 +34,89 @@
         </v-btn>
 
         <!-- Manually created buttons -->
+        <!-- Saved locations -->
+        <v-menu
+          :close-on-content-click="false"
+          :nudge-width="200"
+          offset-y
+          v-if="user"
+        >
+
+        <!-- Button activator to open Saves -->
+        <template v-slot:activator="{ on }">
+          <v-btn flat
+                 color="blue"
+                 class="hidden-sm-and-down"
+                 v-on="on">
+            <span>Saves</span>
+            <v-icon right>bookmark</v-icon>
+          </v-btn>
+          <!-- Saves icon for smaller devices -->
+          <v-btn icon flat outline color="blue" class="hidden-md-and-up" v-on="on">
+            <v-icon>bookmark</v-icon>
+          </v-btn>
+        </template>
+
+        <!-- Cord to contain cards for each location -->
+          <v-card light depressed class="pa-2">
+            <v-layout row wrap>
+
+              <v-flex xs12>
+                <v-card v-if="!locations.length">
+                  <v-card-text>
+                    <p>No saved locations</p>
+                  </v-card-text>
+                </v-card>
+              </v-flex>
+
+              <!-- Location card skeleton -->
+              <v-flex xs12 v-for="stop in locations" :key="stop.stop_id">
+                <v-card class="ma-2">
+                  <!-- Location title -->
+                  <v-card-title primary-title>
+                    <div>
+                      <h3 class="headline mb-0">{{ stop.name }}</h3>
+                      <div> {{ stop.summary }} </div>
+                    </div>
+                  </v-card-title>
+
+                  <!-- Important location information -->
+                  <v-card-text>
+                    <div>
+                      <v-icon left>accessible</v-icon>{{ stop.accessibility.wheelchair ? 'Wheelchair access available.' : 'No wheelchair access / Undefined.' }}
+                    </div>
+                    <div>
+                      <v-icon left>location_on</v-icon>{{ stop.location.address }}
+                    </div>
+                  </v-card-text>
+
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <!-- Find function with tooltip -->
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <v-btn flat fab color="green" v-on="on" @click="find(stop.location.geocode.lat, stop.location.geocode.lng)">
+                          <v-icon>my_location</v-icon>
+                        </v-btn>
+                      </template>
+                      <span>Find on map</span>
+                    </v-tooltip>
+                    <!-- Save location with tooltip -->
+                    <v-tooltip top>
+                      <template v-slot:activator="{ on }">
+                        <v-btn flat fab color="red" v-on="on" @click="deleteSaves(stop.id)">
+                          <v-icon>delete</v-icon>
+                        </v-btn>
+                      </template>
+                      <span>Delete save</span>
+                    </v-tooltip>
+                  </v-card-actions>
+                </v-card>
+              </v-flex>
+            </v-layout>
+          </v-card>
+        </v-menu>
+
         <!-- Sign up -->
         <v-btn flat
                color="amber darken-3"
@@ -155,6 +238,18 @@
         </v-list-tile>
 
         <!-- Manually created tiles -->
+        <!-- Saves tile -->
+        <v-list-tile v-if="user">
+
+          <v-list-tile-action>
+            <v-icon>bookmark</v-icon>
+          </v-list-tile-action>
+
+          <v-list-tile-content>
+            <v-list-tile-title>Saves</v-list-tile-title>
+          </v-list-tile-content>
+
+        </v-list-tile>
         <!-- Sign up tile -->
         <v-list-tile v-if="!user" router to="/sign-up">
 
@@ -203,14 +298,10 @@
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import { fb } from '@/config/Firebase'
+import { fb, db } from '@/config/Firebase'
 
 export default {
   name: 'Navbar',
-
-  components: {
-
-  },
 
   data() {
     return {
@@ -219,13 +310,15 @@ export default {
         { title: 'Map', icon: 'location_on', color: 'green darken-1', route: '/' },
         { title: 'About', icon: 'info', color: 'green darken-1', route: '/about' }
       ],
-      loading: false
+      loading: false,
+      locations: []
     }
   },
 
   methods: {
     ...mapActions([
-      'clearUserAction'
+      'clearUserAction',
+      'findStopAction'
     ]),
     signOut() {
       // Show loading animation
@@ -245,13 +338,49 @@ export default {
         // Push to sign in
         this.$router.push('/sign-in');
       })
+    },
+    find(lat, lng) {
+      let payload = {
+        lat: lat,
+        lng: lng
+      }
+      this.findStopAction(payload)
+    },
+    deleteSaves(id) {
+      db.collection("saved-stops").doc(id).delete()
+      .then(() => {
+          console.log("Document successfully deleted!");
+      }).catch(error => {
+          console.error("Error removing document: ", error);
+      });
     }
   },
 
   computed: {
     ...mapState([
-      'user'
+      'user',
+
     ])
+  },
+
+  mounted() {
+    console.log(this.user + 'from mounted');
+    db.collection('saved-stops').onSnapshot(result => {
+      // Clear old data
+      this.locations = [];
+
+      // Populate with new data
+      result.forEach(loc => {
+        if (loc.data().user == this.user) {
+          this.locations.push({
+            id: loc.id,
+            // Spread the data inside object
+            ...loc.data().obj
+          })
+        }
+      })
+    });
+    console.log(this.locations);
   }
 }
 </script>

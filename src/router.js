@@ -10,7 +10,7 @@ export default new Router({
     {
       path: '/',
       name: 'map',
-      component: () => import(/* webpackChunkName: "about" */ './views/Map.vue')
+      component: () => import(/* webpackChunkName: "about" */ './views/Infomap.vue')
     },
     {
       path: '/about',

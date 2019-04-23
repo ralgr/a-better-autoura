@@ -4,6 +4,7 @@
 
     <v-layout column wrap>
 
+      <!-- Location list drawer -->
       <v-navigation-drawer
         :value="drawer"
         hide-overlay
@@ -14,40 +15,47 @@
         :style="{display: isOpen}"
       >
 
+      <!-- Group content selection -->
       <v-list class="ma-3">
-        <v-list-tile
+        <v-tooltip top>
+          <template v-slot:activator="{ on }">
+            <v-list-tile >
+              <v-list-tile-action v-on="on">
+                <v-icon>people</v-icon>
+              </v-list-tile-action>
 
-        >
-          <v-list-tile-action>
-            <v-icon>people</v-icon>
-          </v-list-tile-action>
-
-          <v-list-tile-content>
-            <v-flex pt-2 xs12 d-flex>
-              <v-select
-                :items="groupCont"
-                label="group context"
-                v-model="pickedContext"
-              ></v-select>
-            </v-flex>
-          </v-list-tile-content>
-        </v-list-tile>
+              <v-list-tile-content v-on="on">
+                <v-flex pt-2 xs12 d-flex>
+                  <v-select
+                    :items="groupCont"
+                    label="group context"
+                    v-model="pickedContext"
+                  ></v-select>
+                </v-flex>
+              </v-list-tile-content>
+            </v-list-tile>
+          </template>
+          <span>Select group context</span>
+        </v-tooltip>
       </v-list>
 
+      <!-- Location list  -->
       <v-flex xs12>
-
         <v-list three-line scrollable>
           <v-subheader>Results</v-subheader>
             <template v-for="(stop, index) in stops">
 
-              <v-divider></v-divider>
+              <v-divider :key="stop.stop_id + index"></v-divider>
 
-
+              <!-- Location details per result -->
                 <v-list-tile
                   :key="stop.stop_id"
                   avatar
                   @click="moreInfo(index)"
+                  @mouseover="biggify(index)"
+                  @mouseleave="smallify(index)"
                 >
+                  <!-- Avatar image -->
                   <v-list-tile-avatar>
                     <cld-image :cloudName="stop.picture.cloudinary_cloud_name"
                                :publicId="stop.picture.cloudinary_public_id"
@@ -59,6 +67,7 @@
                     </cld-image>
                   </v-list-tile-avatar>
 
+                  <!-- Text content -->
                   <v-list-tile-content>
                     <v-list-tile-title v-html="stop.name"></v-list-tile-title>
                     <v-list-tile-sub-title v-html="stop.location.address"></v-list-tile-sub-title>
@@ -66,9 +75,7 @@
                 </v-list-tile>
 
             </template>
-
           </v-list>
-
       </v-flex>
 
       </v-navigation-drawer>
@@ -107,7 +114,9 @@ export default {
       items: [
           { title: 'Home', icon: 'dashboard' },
           { title: 'About', icon: 'question_answer' }
-        ]
+      ],
+      iconSize: [[50, 50], [100, 100]],
+      zIndex: [0, 9999],
     }
   },
 
@@ -115,7 +124,9 @@ export default {
     ...mapActions([
       'setStopsAction',
       'setInfoAction',
-      'openInfoAction'
+      'openInfoAction',
+      'biggifyAction',
+      'smallifyAction'
     ]),
     getStops() {
       const autora = axios.create({ headers: { 'Authorization': 'Bearer ' + AUTORA_KEY } })
@@ -123,8 +134,19 @@ export default {
       autora.get(url)
       .then(r => {
 
+        // Mapping new data on each result
+        let response = r.data.response.map(response => {
+
+          // Icon size data
+          response.iconSize = this.iconSize[0];
+          // Z index data
+          response.zIndex = this.zIndex[0];
+
+          return response;
+        })
+
         // Stops are sent to the store
-        this.setStopsAction(r.data.response);
+        this.setStopsAction(response);
       }).catch(e => {
 
         // Log error
@@ -133,8 +155,26 @@ export default {
       });
     },
     moreInfo(index) {
+      // Selects the location to display in the Moreinfo component
       this.setInfoAction(this.stops[index])
+      // Opens the Moreinfo component
       this.openInfoAction()
+    },
+    biggify(index) {
+      let payload = {
+        index: index,
+        iconSize: this.iconSize[1],
+        zIndex: this.zIndex[1]
+      }
+      this.biggifyAction(payload)
+    },
+    smallify(index) {
+      let payload = {
+        index: index,
+        iconSize: this.iconSize[0],
+        zIndex: this.zIndex[0]
+      }
+      this.smallifyAction(payload)
     }
   },
 

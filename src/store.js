@@ -4,12 +4,16 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
+  strict: true,
+
   state: {
     user: null,
     stops: [],
     drawer: false,
     info: null,
-    dialog: false
+    dialog: false,
+    latlng: null,
+    locations: []
   },
 
   getters: {
@@ -35,7 +39,6 @@ export default new Vuex.Store({
     },
     setInfo: (state, payload) => {
       state.info = payload
-      console.log(state.info);
     },
     openInfo: state => {
       if (state.dialog == true) {
@@ -43,6 +46,17 @@ export default new Vuex.Store({
       } else if (state.dialog == false) {
         state.dialog = true
       }
+    },
+    biggify: (state, payload) => {
+      state.stops[payload.index].iconSize = payload.iconSize;
+      state.stops[payload.index].zIndex = payload.zIndex;
+    },
+    smallify: (state, payload) => {
+      state.stops[payload.index].iconSize = payload.iconSize;
+      state.stops[payload.index].zIndex = payload.zIndex;
+    },
+    findStop: (state, payload) => {
+      state.latlng = payload
     }
   },
 
@@ -64,6 +78,15 @@ export default new Vuex.Store({
     },
     openInfoAction: ({ commit }) => {
       commit('openInfo')
+    },
+    biggifyAction: ({ commit }, payload) => {
+      commit('biggify', payload)
+    },
+    smallifyAction: ({ commit }, payload) => {
+      commit('smallify', payload)
+    },
+    findStopAction: ({ commit }, payload) => {
+      commit('findStop', payload)
     }
   }
 })
