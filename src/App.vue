@@ -1,7 +1,10 @@
 <template>
-  <v-app dark class="grey darken-4">
+  <v-app>
 
     <Navbar/>
+    <MobileNav/>
+    <ErrorAlert/>
+    <SuccessAlert/>
 
     <v-content>
       <v-container fluid class="pa-0">
@@ -16,8 +19,10 @@
 
 <script>
 import Navbar from './components/Navbar'
+import MobileNav from './components/MobileNav'
 import Footer from './components/Footer'
-import { fb } from './config/Firebase'
+import ErrorAlert from './components/ErrorAlert'
+import SuccessAlert from './components/SuccessAlert'
 import { mapActions } from 'vuex'
 
 export default {
@@ -25,7 +30,10 @@ export default {
 
   components: {
     Navbar,
-    Footer
+    Footer,
+    ErrorAlert,
+    SuccessAlert,
+    MobileNav
   },
 
   data () {
@@ -35,33 +43,13 @@ export default {
 
   methods: {
     ...mapActions([
-      'setUserAction',
-      'clearUserAction'
-    ]),
-    log() {
-      console.log('Test');
-    }
+      'detectUserAction',
+      'getSavesAction'
+    ])
   },
 
   created() {
-    // Detect sign ins and outs.
-    fb.auth().onAuthStateChanged(user => {
-      if (user) {
-
-        // Set user in store.
-        this.setUserAction(user)
-
-        // Push to map
-        this.$router.push('/')
-        console.log(user.email + ' is currently logged in');
-      } else {
-        // User is signed out.
-        fb.auth().signOut();
-
-        // User is cleared on store
-        this.clearUserAction
-      }
-    });
+    this.detectUserAction()
   }
 }
 </script>

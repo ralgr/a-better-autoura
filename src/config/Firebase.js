@@ -3,12 +3,13 @@ import 'firebase/auth'
 import 'firebase/firestore'
 
 var config = {
-    apiKey: "AIzaSyBaw8nNuZLld5s_jYcBZHePqDDxitn2iVo",
-    authDomain: "autora-a1.firebaseapp.com",
-    databaseURL: "https://autora-a1.firebaseio.com",
-    projectId: "autora-a1",
-    storageBucket: "autora-a1.appspot.com",
-    messagingSenderId: "107072092595"
+  apiKey: "AIzaSyBG5fI5yNyIHx5eDRcxmeWDmLz_8wcD_Bc",
+  authDomain: "autoura-san-b3e30.firebaseapp.com",
+  databaseURL: "https://autoura-san-b3e30.firebaseio.com",
+  projectId: "autoura-san-b3e30",
+  storageBucket: "autoura-san-b3e30.appspot.com",
+  messagingSenderId: "83092347134",
+  appId: "1:83092347134:web:5f71a04acea7a570"
   };
 
 export const fb = firebase.initializeApp(config);

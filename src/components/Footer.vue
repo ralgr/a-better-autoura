@@ -1,17 +1,16 @@
 <template lang="html">
-  <div class="footer">
-    <v-footer
-    dark
-    height="auto" app>
-
-      <v-layout row wrap justify-center>
-
-        <strong class="caption font-weight-light grey--text">&copy;2019 — InformationMap</strong>
-
-      </v-layout>
-
-    </v-footer>
-  </div>
+  <v-footer color="transparent">
+   <v-layout column>
+     <v-flex xs6>
+       <v-card
+        flat
+        color="transparent"
+        class="text-xs-center">
+         <strong class="caption">&copy;2019 — InformationMap</strong>
+       </v-card>
+     </v-flex>
+   </v-layout>
+  </v-footer>
 </template>
 
 <script>
@@ -20,13 +19,7 @@ export default {
 
   data() {
     return {
-      icons: [
-        'fab fa-facebook',
-        'fab fa-twitter',
-        'fab fa-google-plus',
-        'fab fa-linkedin',
-        'fab fa-instagram'
-      ]
+
     }
   }
 }

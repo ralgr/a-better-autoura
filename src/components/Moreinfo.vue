@@ -1,7 +1,7 @@
 <template lang="html">
-  <div class="moreInfo" v-if="info">
+  <div class="moreInfo" v-if="infoGetter">
     <v-dialog
-      :value="dialog"
+      :value="dialogGetter"
       width="500"
       persistent
       light
@@ -11,92 +11,122 @@
         <v-flex xs12>
           <v-card>
 
-            <v-img height="300" class="hidden-sm-and-down">
-              <!-- Image from cloudinary -->
-              <cld-image :cloudName="info.picture.cloudinary_cloud_name"
-                         :publicId="info.picture.cloudinary_public_id"
-                         secure="true"
-                         dpr="auto"
-                         width="auto"
-                         crop="scale">
-                <cld-transformation crop="thumb"
-                                    height="400"/>
-              </cld-image>
+            <!-- Image from cloudinary -->
+            <v-img aspect-ratio="1"
+                   max-height="300"
+                   class="hidden-sm-and-down"
+                   :src="infoGetter.picture.url">
+
+              <!-- MD and UP UI -->
+              <v-layout column fill-height>
+                <v-card-title>
+                <!-- Close card button -->
+                 <v-btn
+                  icon dark flat
+                  @click="openInfoAction">
+                   <v-icon large>close</v-icon>
+                 </v-btn>
+
+                 <v-spacer></v-spacer>
+
+                 <!-- Find function without tooltip -->
+                 <v-btn
+                  icon
+                  color="orange"
+                  @click="find(infoGetter.location.geocode.lat, infoGetter.location.geocode.lng)">
+                   <v-icon color="white">my_location</v-icon>
+                 </v-btn>
+                 <!-- Save location without tooltip -->
+                 <v-btn
+                  v-if="userGetter && contextGetter == 'locations'"
+                  icon
+                  color="primary"
+                  @click="save">
+                   <v-icon>bookmark</v-icon>
+                 </v-btn>
+                 <v-btn
+                  v-if="userGetter && contextGetter == 'saves'"
+                  icon
+                  color="error"
+                  @click="toDeleteSave">
+                   <v-icon>delete</v-icon>
+                 </v-btn>
+                </v-card-title>
+
+                 <v-spacer></v-spacer>
+
+                 <v-card-title primary-title class="white--text pl-5 pt-5">
+                   <h3 class="display-1">{{ infoGetter.name }}</h3>
+                 </v-card-title>
+              </v-layout>
             </v-img>
 
-            <v-card-text>
-              <p class="display-1 text-xs-center">{{ info.name }}</p>
-            </v-card-text>
+            <v-card :class="{'pa-2': $vuetify.breakpoint.xsOnly, 'pa-4': $vuetify.breakpoint.smAndUp}">
+              <v-card-title primary-title class="hidden-md-and-up">
+                <h3 class="headline pb-0">{{ infoGetter.name }}</h3>
+              </v-card-title>
+              <v-divider class="hidden-md-and-up"></v-divider>
 
-            <!-- List for Description -->
-            <v-list three-line class="px-3">
+              <!-- List for Description -->
+              <v-card-text>
+                <p class="subheading mb-2">Information</p>
+                <div class="body-1">{{ infoGetter.summary }}</div>
+              </v-card-text>
 
-              <!-- Description tile -->
-              <v-list-tile>
-                <v-list-tile-action>
-                  <v-icon color="blue" >info</v-icon>
-                </v-list-tile-action>
+              <v-card-text>
+                <p class="subheading mb-2">Accessibility</p>
+                {{ wheelchair }}
+              </v-card-text>
 
-                <v-list-tile-action>
-                  <v-list-tile-action-text class="body-2 font-weight-light grey--text text--darken-4">
-                    {{ info.summary }}
-                  </v-list-tile-action-text>
-                </v-list-tile-action>
-              </v-list-tile>
+              <v-card-text>
+                <p class="subheading mb-2">Address</p>
+                {{ infoGetter.location.address }}
+              </v-card-text>
 
-              <!-- Accessibility tile -->
-              <v-list-tile>
-                <v-list-tile-action>
-                  <v-icon color="green" >accessible</v-icon>
-                </v-list-tile-action>
+              <v-card-text v-if="infoGetter.website_url">
+                <p class="subheading mb-2">Website</p>
+                <a :href="infoGetter.website_url"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                   {{ infoGetter.website_url }}
+                 </a>
+              </v-card-text>
 
-                <v-list-tile-content>
-                  <v-list-tile-action-text class="body-2 font-weight-light grey--text text--darken-4">
-                    {{ wheelchair }}
-                  </v-list-tile-action-text>
-                </v-list-tile-content>
-              </v-list-tile>
-
-              <!-- Location tile -->
-              <v-list-tile>
-                <v-list-tile-action>
-                  <v-icon color="red" >location_on</v-icon>
-                </v-list-tile-action>
-
-                <v-list-tile-content>
-                  <v-list-tile-action-text class="body-2 font-weight-light grey--text text--darken-4">
-                    {{ info.location.address }}
-                  </v-list-tile-action-text>
-                </v-list-tile-content>
-              </v-list-tile>
-
-            </v-list>
-
-            <!-- Card actions -->
-            <v-card-actions>
-              <!-- Find function with tooltip -->
-              <v-tooltip top>
-                <template v-slot:activator="{ on }">
-                  <v-btn icon v-on="on" @click="find(info.location.geocode.lat, info.location.geocode.lng)">
-                    <v-icon>my_location</v-icon>
-                  </v-btn>
-                </template>
-                <span>Find on map</span>
-              </v-tooltip>
-              <!-- Save location with tooltip -->
-              <v-tooltip top>
-                <template v-slot:activator="{ on }">
-                  <v-btn icon v-on="on" @click="save">
-                    <v-icon>bookmark</v-icon>
-                  </v-btn>
-                </template>
-                <span>Save location</span>
-              </v-tooltip>
-              <v-spacer></v-spacer>
-              <v-btn  round flat small color="green" @click="openInfoAction">
-                Close
-              </v-btn>
-            </v-card-actions>
+              <!-- Card actions -->
+              <v-card-actions class="hidden-md-and-up">
+                <!-- Find function with tooltip -->
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <v-btn flat color="orange" icon large v-on="on" @click="find(infoGetter.location.geocode.lat, infoGetter.location.geocode.lng)">
+                      <v-icon large>my_location</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Find on map</span>
+                </v-tooltip>
+                <!-- Save location with tooltip -->
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <v-btn v-if="userGetter && contextGetter == 'locations'" flat color="primary" icon large v-on="on" @click="save">
+                      <v-icon large>bookmark</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Save location</span>
+                </v-tooltip>
+                <!-- Save location with tooltip -->
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <v-btn v-if="userGetter && contextGetter == 'saves'" flat color="error" icon large v-on="on" @click="toDeleteSave">
+                      <v-icon large>delete</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Delete save</span>
+                </v-tooltip>
+                <v-spacer></v-spacer>
+                <v-btn  round flat color="green" @click="openInfoAction">
+                  Close
+                </v-btn>
+              </v-card-actions>
+            </v-card>
           </v-card>
         </v-flex>
       </v-layout>
@@ -106,28 +136,17 @@
 </template>
 
 <script>
-import { CldImage, CldTransformation } from 'cloudinary-vue'
-import { mapState, mapActions } from 'vuex'
-import { db } from '@/config/Firebase'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'Moreinfo',
 
-  components: {
-    CldImage,
-    CldTransformation
-  },
-
-  data() {
-    return {
-      loading: false
-    }
-  },
-
   methods: {
     ...mapActions([
       'openInfoAction',
-      'findStopAction'
+      'findStopAction',
+      'saveStopsAction',
+      'deleteSaveAction'
     ]),
     find(lat, lng) {
       let payload = {
@@ -137,32 +156,23 @@ export default {
       this.findStopAction(payload)
     },
     save() {
-      // Turn on loading animation
-      this.loading = true
-
-      // Add the user to save data for filtering
-      let location = {
-        obj: this.info,
-        user: this.user,
-      }
-
-      // Save location
-      db.collection('saved-stops').add(location)
-      .then(() => {
-        this.loading = false;
-        this.openInfoAction();
-      })
+      // Save Stops
+      this.saveStopsAction()
+    },
+    toDeleteSave() {
+      this.deleteSaveAction(this.infoGetter.id)
     }
   },
 
   computed: {
-    ...mapState([
-      'info',
-      'dialog',
-      'user'
+    ...mapGetters([
+      'userGetter',
+      'dialogGetter',
+      'infoGetter',
+      'contextGetter'
     ]),
     wheelchair() {
-      return this.info.accessibility.wheelchair ? 'Wheelchair access available.' : 'No wheelchair access / Undefined.'
+      return this.infoGetter.accessibility.wheelchair ? 'Wheelchair access available.' : 'No wheelchair access / Undefined.'
     }
   }
 }

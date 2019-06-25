@@ -1,17 +1,14 @@
 <template lang="html">
   <div class="map">
-
-    <v-layout row wrap>
+    <v-layout row wrap fill-height>
       <v-flex xs12>
-
         <!-- Map card container -->
-        <v-card >
+        <v-card>
 
           <!-- FAB button to open UI -->
-
             <v-tooltip top>
               <template v-slot:activator="{ on }">
-                <v-btn color="blue"
+                <v-btn color="orange"
                        dark
                        absolute
                        bottom
@@ -34,12 +31,9 @@
           <v-responsive height="80vh">
             <Leaflet/>
           </v-responsive>
-
         </v-card>
-
       </v-flex>
     </v-layout>
-
   </div>
 </template>
 
@@ -47,7 +41,7 @@
 import Mapui from '@/components/Mapui'
 import Moreinfo from '@/components/Moreinfo'
 import Leaflet from '@/components/Leaflet'
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'Infomap',
@@ -66,14 +60,26 @@ export default {
 
   methods: {
     ...mapActions([
-      'openDrawerAction'
+      'openDrawerAction',
+      'getSavesAction'
     ]),
     openMapUi() {
       this.openDrawerAction()
     }
-  }
+  },
+   computed: {
+     ...mapGetters([
+       'savedLocationsGetter'
+     ])
+   },
+   mounted() {
+     this.getSavesAction();
+   }
 }
 </script>
 
 <style lang="css" scoped>
+.map {
+  min-height: 80vh;
+}
 </style>

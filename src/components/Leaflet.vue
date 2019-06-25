@@ -7,10 +7,12 @@
          >
      <l-tile-layer :url="url"
                    :attribution="attribution"></l-tile-layer>
-     <l-marker  v-for="stop in stops"
+     <l-marker  v-for="(stop, index) in stopsGetter"
                 :key="stop.stop_id"
                 :lat-lng="createMarker(stop.location.geocode.lat, stop.location.geocode.lng)"
-                :z-index-offset="stop.zIndex">
+                :z-index-offset="stop.zIndex"
+                @mouseover="toHighlight(index)"
+                @mouseleave="toRemoveHighlight(index)">
         <l-popup>
           <span class="stop-visuals">
             <strong>{{ stop.name }}<br/></strong>
@@ -29,7 +31,7 @@
 <script>
 import {LMap, LTileLayer, LMarker, LPopup, LIcon} from 'vue2-leaflet'
 import iconUrl from '@/assets/pin.svg'
-import { mapState } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'Leaflet',
@@ -53,6 +55,10 @@ export default {
    },
 
    methods: {
+     ...mapActions([
+       'highlightAction',
+       'unhighlightAction'
+     ]),
      createMarker(lat, lng) {
        return L.latLng(lat, lng)
      },
@@ -68,13 +74,22 @@ export default {
        // Re centers the map on the selected location
         this.center = L.latLng(this.latlng.lat, this.latlng.lng)
         this.zoom = 18
+     },
+     toHighlight(index) {
+       this.highlightAction(index)
+     },
+     toRemoveHighlight(index) {
+       this.unhighlightAction(index)
      }
    },
 
    computed: {
+     ...mapGetters([
+       'stopsGetter',
+     ]),
      ...mapState([
-       'stops',
-       'latlng'
+       'latlng',
+       'latlngGetter'
      ])
    },
 
