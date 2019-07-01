@@ -2,6 +2,7 @@
 
 1. Completed app: https://autoura-san-b3e30.firebaseapp.com/ 
 2. Repository: https://github.com/ralgr/a-better-autoura
+3. Documentation on reposirtory: https://github.com/ralgr/a-better-autoura/blob/master/documentation.md
 
 # Background
 
