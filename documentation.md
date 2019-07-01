@@ -182,7 +182,7 @@ firebase deploy --only hosting
 
 ## Google Lighthouse Audit
 
-[[ //IMAGE HERE ]]
+![Audit](https://github.com/ralgr/a-better-autoura/blob/master/src/assets/autouraAudit.PNG)
 
 As expected, the application scores well in the Best Practices, SEO and PWA areas of the audit as these are mostly automatically configured by the Vue.js framework. The use of Passive Listeners were recommended to further improve the score for Best Practices, while Meta Descriptions being unavailable prevents the SEO area from scoring higher. The Accessibility area is also relatively high but the score as is shown was due to unnamed buttons, which can result in screen readers just announcing the element as is without further context. Additionally, There were also problems with the contrast ratio of the background and foreground that may impact the visibility of elements. Finally, the Performance area where the app scored the lowest gave multiple reasons for the score with the most important being:
 
