@@ -1,3 +1,8 @@
+# Links
+
+1. Completed app: https://autoura-san-b3e30.firebaseapp.com/ 
+2. Repository: https://github.com/ralgr/a-better-autoura
+
 # Background
 
 This project covers the creation of an interactive map that shows available locations around the United Kingdom related to food acquisition. The features included in the project are as follows:
@@ -7,20 +12,15 @@ This project covers the creation of an interactive map that shows available loca
 
 This project and its features will be created using the Vue.js JavaScript framework as it simplifies the coding of complex features and decreases the time of development.  
 
-## Planning and Prototyping using Adobe XD
-![Wireframe](https://github.com/ralgr/autora-a1/blob/master/dsasdawearqwasda.PNG)
-
-## [Version 1](https://github.com/ralgr/autora-a1)
-
-## [Version 2](https://github.com/ralgr/a-better-autoura)
-
 # Methods
 
 ## Planning and Prototyping using Adobe XD
 
 Adobe XD was used to create a quick prototype for how the elements of the app will be laid out for different screen sizes. This step reduced the time spent on experimentations pertaining to the apps appearance, which resulted in having all the stated features above being polished to the point of working order at the least.
 
-//IMAGE OF PROTOTYPE HERE
+![Protoype](https://github.com/ralgr/a-better-autoura/blob/master/src/assets/DesktopXDProto.PNG)
+![Protoype](https://github.com/ralgr/a-better-autoura/blob/master/src/assets/desktopCard.PNG)
+![Protoype](https://github.com/ralgr/a-better-autoura/blob/master/src/assets/mobileXDapp.PNG)
 
 ## Vue.js JavaScript Framework
 As stated above, this project made use of the Vue.js framework. In terms of browser support, it is stated in the [Vue GitHub Repository](https://github.com/vuejs/vue#browser-compatibility) that Vue.js supports all browsers that are [ES5-compliant](https://kangax.github.io/compat-table/es5/). However, this means that users of Internet Explorer version 8 or lower will not be able to run the app.
