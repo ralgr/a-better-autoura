@@ -29,6 +29,20 @@ export default {
 
   components: {
     Authform
+  },
+
+  beforeRouteEnter (to, from, next) {
+    // Guard for reloads
+    // Redirects to InfoMap view on page reload or manual URL entry
+    next(vm => {
+      // Checks if "user" is not null on the store
+      if (vm.$store.getters.userGetter) {
+        // Redirect to SearchByShape view if "user" is null
+        next({name: 'map'})
+      }
+
+      // Continues to load the view if "user" is not null
+    })
   }
 }
 </script>

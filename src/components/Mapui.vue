@@ -21,7 +21,7 @@
             <v-icon right>map</v-icon>
           </v-btn>
           <v-btn
-            flat @click="tab = 'saves'"
+            flat @click="toOpenSaves"
             color="orange"
             v-if="userGetter"
             :class="{'orange lighten-4': tab == 'saves'}">
@@ -176,6 +176,10 @@ export default {
       'getStopsAction',
       'getSavesAction'
     ]),
+    toOpenSaves() {
+      this.tab = 'saves'
+      this.getSavesAction()
+    },
     getStops() {
       const payload = {
         key: AUTORA_KEY,

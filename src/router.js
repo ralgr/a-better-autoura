@@ -1,5 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import Infomap from './views/Infomap.vue'
+import Signup from './views/Infomap.vue'
+import Signin from './views/Infomap.vue'
 
 Vue.use(Router)
 
@@ -10,17 +13,17 @@ export default new Router({
     {
       path: '/',
       name: 'map',
-      component: () => import(/* webpackChunkName: "about" */ './views/Infomap.vue')
+      component: Infomap
     },
     {
       path: '/sign-up',
       name: 'sign-up',
-      component: () => import(/* webpackChunkName: "about" */ './views/Signup.vue')
+      component: Signup
     },
     {
       path: '/sign-in',
       name: 'sign-in',
-      component: () => import(/* webpackChunkName: "about" */ './views/Signin.vue')
+      component: Signin
     }
   ]
 })
