@@ -1,6 +1,6 @@
 # Links
 
-1. Completed app: https://autoura-san-b3e30.firebaseapp.com/ 
+1. Completed app: https://autoura-san-b3e30.firebaseapp.com/
 2. Repository: https://github.com/ralgr/a-better-autoura
 3. Documentation on repository: https://github.com/ralgr/a-better-autoura/blob/master/documentation.md
 
@@ -37,7 +37,65 @@ Starting the development and creating the local folder for the app was done usin
 The following Vue.js packages were installed for the project to fulfil its intended purpose:
 
 1. **[Axios](https://www.npmjs.com/package/axios)** - The location data for the app is taken from the [Autoura API](https://www.autoura.com/), as previously stated. To that end, Axios was installed to consume the API and make use of these location data.
+
+```
+// [[ AXIOS ACTIONS ]]
+getStopsAction: ({ dispatch }, payload) => {
+  // Get locations using Axios
+  const autora = axios.create({ headers: { 'Authorization': 'Bearer ' + payload.key } })
+  var url = `https://api.autoura.com/api/stops/search?group_context=${payload.context}&stop_types=food`
+  autora.get(url)
+  .then(r => {
+    // Mapping new data on each result
+    let response = r.data.response.map(response => {
+
+      // Icon size data
+      response.iconSize = payload.iconSize[0];
+      // Z index data
+      response.zIndex = payload.zIndex[0];
+      // Highlight data
+      response.isHighlighted = false;
+
+      return response;
+    })
+
+    // Stops are sent to the store
+    dispatch('setStopsAction', response)
+  })
+},
+```
+
 2. **[Vue2Leaflet](https://github.com/KoRiGaN/Vue2Leaflet)** - This package is used to display a map using the transport tiles from [Thunderforest](https://www.thunderforest.com/maps/transport/). The Leaflet marker feature from this package is what the app uses to display the locations on the map tiles. In addition, the popup feature allows the user to click these markers to display information on the clicked location.
+
+```
+<l-map :zoom="zoom"
+       :center="center"
+       @update:center="updateCenter"
+       @update:zoom="updateZoom"
+       style="z-index: 0"
+       >
+   <l-tile-layer :url="url"
+                 :attribution="attribution"></l-tile-layer>
+   <l-marker  v-for="(stop, index) in stopsGetter"
+              :key="stop.stop_id"
+              :lat-lng="createMarker(stop.location.geocode.lat, stop.location.geocode.lng)"
+              :z-index-offset="stop.zIndex"
+              @mouseover="toHighlight(index)"
+              @mouseleave="toRemoveHighlight(index)">
+      <l-popup>
+        <span class="stop-visuals">
+          <strong>{{ stop.name }}<br/></strong>
+        </span>
+        {{ stop.location.address }}<br/>
+        <button type="button"
+                >More info</button>
+      </l-popup>
+      <l-icon :icon-size="stop.iconSize"
+              :icon-url="icon">
+      </l-icon>
+   </l-marker>
+</l-map>
+```
 
 ## Vuetify Material Design Component Framework
 
@@ -49,13 +107,13 @@ As mentioned, [Firebase](https://firebase.google.com/) was used as complete back
 
 Additionally, the authentication feature available when integrating Firebase was also implemented. Authentication in this case, relates to the creation of accounts to do multiple things:
 
-1. To be **gain access**  of the save feature.
+1. To **gain access**  of the save feature.
 2. As a **usability feature** to attribute the correct saved data to the correct user and only show these saved data.
 3. As a **key** used in deciding whether to display or remove additional user interface elements pertaining to saving locations, which is a feature intended for users that are logged in only.
 
 ## GitHub Workflow
 
-This project also makes use of GitHub for version control. The ability to create branches separate from a main branch will enable the project to have a safe and efficient environment for experimentation without risk of breaking the application. The project workflow will be an iterative process will mainly follow the pattern below for each feature to be included:
+This project also makes use of GitHub for version control. The ability to create branches separate from a main branch will enable the project to have a safe and efficient environment for experimentation without risk of breaking the application. The project workflow will be an iterative process that will mainly follow the pattern below for each feature to be included:
 
 ```
 1. Create a experimentation branch.
@@ -87,7 +145,7 @@ Manual testing was also conducted throughout the development to ensure that each
 
 ### Firestore Rules
 
-The Firestore database is set up so that only users are able to read and write data onto it by modifying the rules to check if they are authenticated as shown below.
+The Firestore database is set up so that only registered and logged in users are able to read and write data onto it by modifying the rules to check if they are authenticated as shown below.
 
 ```
 service cloud.firestore {
@@ -101,15 +159,115 @@ service cloud.firestore {
 
 ### Saving Locations
 
-Firestore is used to store any of the presented locations shown on the map component. This is implemented in two steps:
+Firestore is where the location data of any of the shown locations on the map that the user wants to save is stored. This is implemented in two steps:
 
-1. To prevent data duplications, do a database call to check if the location that the user is trying to save is already present in the database. This check is done by performing [compound queries](https://firebase.google.com/docs/firestore/query-data/queries) for the location being saved and then using the [```get()```](https://firebase.google.com/docs/firestore/query-data/get-data)
+1. To prevent data duplications, the app will first do a database call to check if the location that the user is trying to save is already present in the database. This check is done by performing [compound queries](https://firebase.google.com/docs/firestore/query-data/queries) for the location being saved and then using the [```get()```](https://firebase.google.com/docs/firestore/query-data/get-data)
 method to look through the database once.
-2. If the location being saved is present in the database, send out an error notification using the alert component. Otherwise, proceed to save the data and send out a success notification using the alert component. Before proceeding with the save, the location data, which is an object, is altered to include the username of the user trying to save the location for use in matching the correct location to the correct user later on as mentioned. Saving the data makes use of the [```add()```](https://firebase.google.com/docs/firestore/manage-data/add-data) method for convenience as it automatically creates a unique ID for the document.
+2. If the location being saved is present in the database, send out an error notification using the error alert component. Otherwise, proceed to save the data and send out a success notification using the success alert component. Before proceeding with the save, the location data, which is an object, is altered to include the username of the user trying to save the location for use in matching the correct location to the correct user later on as mentioned. Saving the data makes use of the [```add()```](https://firebase.google.com/docs/firestore/manage-data/add-data) method for convenience as it automatically creates a unique ID for the document.
+
+```
+// [[ FIRESTORE ACTIONS ]]
+saveStopsAction: ({ getters, commit }) => {
+  // Add user to the stop data for filtering on backend
+  let stopToSave = getters.infoGetter
+  stopToSave['user'] = getters.userGetter
+
+  // Check for duplicates
+  db.collection('saved-stops')
+  .where("user", "==", `${getters.userGetter}`)
+  .where("name", "==", `${getters.infoGetter.name}`)
+  .get()
+  .then(data => {
+    // Add data if no duplicates
+    if (data.empty == true) {
+      db.collection('saved-stops')
+      .add(stopToSave)
+      .then(() => {
+        // Clear previous alerts
+        commit('clearSuccessAppAlert')
+
+        // Stop loading animation
+        commit('setAuthenticatingFalse')
+
+        // Set alert message.
+        const successMsg = {
+          msg: 'Location saved',
+          color: 'primary'
+        }
+
+        // Show alert Message
+        commit('showSuccessAppAlert', successMsg)
+      })
+    }
+
+    // Show alert if there are duplicates
+    if (data.empty == false) {
+      // Clear previous alerts
+      commit('clearErrorAppAlert')
+
+      // Stop loading animation
+      commit('setAuthenticatingFalse')
+
+      // Set alert message.
+      const errorMsg = {
+        msg: 'The selected location is already saved',
+        color: 'error'
+      }
+
+      // Show alert Message
+      commit('showErrorAppAlert', errorMsg)
+    }
+  })
+},
+```
 
 ### Getting and Deleting the Saved Locations
 
 At the same time, Firestore is also calibrated to provide the app with the information of the current contents stored in the database for a specific user. This information is shown in real-time using the [```onSnapshot()```](https://firebase.google.com/docs/firestore/query-data/listen) method where inside, the location object is again modified to include its auto-generated unique ID given by Firebase before being set in the central store. This ID information will then be used as a reference to the saved data located in the Firestore that is to be deleted using the [```delete()```](https://firebase.google.com/docs/firestore/manage-data/delete-data) method.
+
+```
+getSavesAction: ({commit, getters}) => {
+  // Get saved locations from firebase
+  db.collection('saved-stops')
+  .where("user", "==", `${getters.userGetter}`)
+  .onSnapshot(data => {
+    let stopsFromFirebase = [];
+
+    data.forEach(stop => {
+      stopsFromFirebase.push({
+        id: stop.id,
+        ...stop.data()
+      })
+    })
+
+    commit('getSaves', stopsFromFirebase)
+  })
+},
+deleteSaveAction: ({commit}, payload) => {
+  // Get saved locations from firebase
+  db.collection("saved-stops").doc(payload).delete()
+  .then(() => {
+    // Set alert message.
+    const successMsg = {
+      msg: 'Location deleted',
+      color: 'primary'
+    }
+
+    // Show alert Message
+    commit('showSuccessAppAlert', successMsg)
+    commit('openInfo')
+  }).catch(error => {
+    // Set alert message.
+    const successMsg = {
+      msg: error,
+      color: 'error'
+    }
+
+    // Show alert Message
+    commit('showSuccessAppAlert', successMsg)
+  });
+},
+```
 
 ## Mapping and Geolocation
 
@@ -119,12 +277,53 @@ The map component of the project made use of Leaflet [markers](https://leafletjs
 
 The popups are implemented in a standard way in which it shows the location name and address for each location. On the other hand, this project modifies the default appearance of markers by importing ```LIcon``` from the [Vue2Leaflet](https://github.com/KoRiGaN/Vue2Leaflet) library in addition to popups and markers. The change is done by including a custom image on the project assets and is set in the ```LIcon``` component using props.
 
+```
+<l-icon :icon-size="stop.iconSize"
+        :icon-url="icon">
+</l-icon>
+```
+
 In addition to this, two features are implemented as a quality-of-life improvement for the user when using the app:
 
 1. Feature to enlarge the marker upon hovering on a location listing.
 2. Feature to highlight a listing when a marker is hovered.
 
-This is implemented by adding custom data to the location object taken from the [Autoura API](https://www.autoura.com/) in a process inside the [Axios](https://www.npmjs.com/package/axios) call. After the retrieval of the location object and before sending it to the central store, an array of custom values(normal and enlarged) for the z-index and icon size and a highlight data containing ```false``` is added using the JavaScript [```.map()```](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map) method. The icon size and z-index will make use of the normal values initially and is changed to the large values upon hovering a location listing using methods. The highlight data is also changed to ```true``` upon hovering a marker to change the background colour of the listing related to it. Both features return to their normal values upon "un-hovering".
+This is implemented by adding custom data to the location object taken from the [Autoura API](https://www.autoura.com/) in a process inside the [Axios](https://www.npmjs.com/package/axios) call. After the retrieval of the location object and before sending it to the central store, an array of custom values(normal and enlarged) for the z-index and icon size and a highlight data containing ```false``` is added using the JavaScript [```.map()```](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map) method.
+```
+// Mapping new data on each result
+let response = r.data.response.map(response => {
+
+  // Icon size data
+  response.iconSize = payload.iconSize[0];
+  // Z index data
+  response.zIndex = payload.zIndex[0];
+  // Highlight data
+  response.isHighlighted = false;
+
+  return response;
+```
+
+The icon size and z-index will make use of the normal values initially and is changed to the large values upon hovering a location listing using methods. The highlight data is also changed to ```true``` upon hovering a marker to change the background colour of the listing related to it. Both features return to their normal values upon "un-hovering". The below code are Mutations that are dispatched by Actions to follow the VueX coding best practice as stated on the [tutorial by the Net Ninja](https://www.youtube.com/watch?v=arhCOcxIUo4&list=PL4cUxeGkcC9i371QO_Rtkl26MwtiJ30P2&index=7).
+
+```
+// Icon enlarge for locations
+biggify: (state, payload) => {
+  state.stops[payload.index].iconSize = payload.iconSize;
+  state.stops[payload.index].zIndex = payload.zIndex;
+},
+smallify: (state, payload) => {
+  state.stops[payload.index].iconSize = payload.iconSize;
+  state.stops[payload.index].zIndex = payload.zIndex;
+},
+// List highlight for locations
+highlight: (state, payload) => {
+  state.stops[payload].isHighlighted = true;
+},
+// List highlight for saves
+unhighlight: (state, payload) => {
+  state.stops[payload].isHighlighted = false;
+},
+```
 
 ### Finding Selected Location on Map
 
@@ -136,7 +335,21 @@ Clicking an item in the location list shows an card element containing the speci
 | Save location   |       ✔       |           |
 | Delete location |               |     ✔     |
 
-The ```Find location``` function makes use of the latitude and longitude location data present in the location object to re-centre the map to show its exact coordinates as well as altering the zoom level. This is implemented by sending the latitude and longitude data to the central store upon clicking the ```Find location``` button for the map component to then use, as the user interface and map are separate components.   
+The ```Find location``` function makes use of the latitude and longitude location data present in the location object to re-centre the map to show its exact coordinates as well as altering the zoom level. This is implemented by sending the latitude and longitude data along with a new zoom level in an object to be sent as a payload to be used by a receiving Action in the central store upon clicking the ```Find location``` button. The code below are the Mutations dispatched by a single Action.
+
+```
+findStop: (state, payload) => {
+  state.latlng = payload
+},
+
+openInfo: state => {
+  if (state.dialog == true) {
+    state.dialog = false
+  } else if (state.dialog == false) {
+    state.dialog = true
+  }
+},
+```
 
 ## Progressive Web Application
 
