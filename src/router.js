@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Infomap from './views/Infomap.vue'
-import Signup from './views/Infomap.vue'
-import Signin from './views/Infomap.vue'
+import Signup from './views/Signup.vue'
+import Signin from './views/Signin.vue'
 
 Vue.use(Router)
 
