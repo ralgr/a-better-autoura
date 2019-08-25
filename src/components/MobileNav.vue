@@ -36,7 +36,7 @@
     <v-list class="pt-4">
       <!-- Manually created tiles -->
       <!-- Map tile -->
-      <v-list-tile router to="/map">
+      <v-list-tile router to="/">
 
         <v-list-tile-action>
           <v-icon>map</v-icon>
