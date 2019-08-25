@@ -35,6 +35,19 @@
     <!-- Navigation tile -->
     <v-list class="pt-4">
       <!-- Manually created tiles -->
+      <!-- Map tile -->
+      <v-list-tile router to="/map">
+
+        <v-list-tile-action>
+          <v-icon>map</v-icon>
+        </v-list-tile-action>
+
+        <v-list-tile-content>
+          <v-list-tile-title>Map</v-list-tile-title>
+        </v-list-tile-content>
+
+      </v-list-tile>
+
       <!-- Sign up tile -->
       <v-list-tile v-if="!userGetter" router to="/sign-up">
 

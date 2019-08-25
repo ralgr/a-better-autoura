@@ -23,6 +23,14 @@
       <!-- Buttons for md-xl devices -->
       <v-toolbar-items>
         <!-- Manually created buttons -->
+        <!-- Map -->
+        <v-btn flat
+               color="amber darken-3"
+               class="hidden-sm-and-down"
+               router to="/map">
+          <span>Map</span>
+          <v-icon right>map</v-icon>
+        </v-btn>
         <!-- Sign up -->
         <v-btn flat
                color="amber darken-3"
