@@ -372,7 +372,10 @@ export default new Vuex.Store({
         commit('clearUser')
       })
     },
-    signInUserAction: ({ commit }, payload) => {
+    signInUserAction: ({ commit, dispatch }, payload) => {
+      // Clear user if there are any
+      dispatch('clearUserAction')
+
       // Start loading animation
       commit('setAuthenticatingTrue')
 

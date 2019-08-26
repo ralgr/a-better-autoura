@@ -48,7 +48,7 @@ export default {
   },
 
   created() {
-    this.detectUserAction()
+    this.detectUserAction()   
   }
 }
 </script>
