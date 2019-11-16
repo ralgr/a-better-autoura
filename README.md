@@ -2,7 +2,7 @@
 
 This project uses:
 * [Vue](https://vuejs.org/)
-* [Bootstrap](https://getbootstrap.com/)
+* [Vuetify](https://vuetifyjs.com/en/)
 * [Autoura API](https://github.com/Autoura/API/blob/master/readme.md)
 
 ## Description
