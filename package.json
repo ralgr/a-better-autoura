@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@types/leaflet": "^1.4.3",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "cloudinary-vue": "^1.0.0-beta2",
     "core-js": "^2.6.5",
     "firebase": "^5.9.4",
